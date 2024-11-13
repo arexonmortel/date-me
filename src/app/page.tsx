@@ -1,101 +1,180 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React, { useState } from 'react';
+import Confetti from 'react-confetti'
+//import { Calendar, Clock } from 'lucide-react';
+
+const DateInvitation = () => {
+  const [noCount, setNoCount] = useState(0);
+  const [yesPressed, setYesPressed] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [dateType, setDateType] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [message, setMessage] = useState('Will you go on a date with me?');
+  const [showConfetti, setShowConfetti] = useState(false);
+
+
+
+  const messages = [
+    "Are you sure? 🥺",
+    "Are you teasing me? 😋",
+    "Pretty please? 🥹"
+  ];
+
+  const dateTypes = [
+    { id: 'dinner', name: 'Dinner Date 🍝', description: 'Romantic dinner for two at a cozy restaurant' },
+    { id: 'movie', name: 'Movie Night 🎬', description: 'Cozy cinema experience with popcorn' },
+    { id: 'picnic', name: 'Park Picnic 🧺', description: 'Outdoor dining with scenic views' },
+    { id: 'cuddles', name: 'Stay-in Cuddles 🛋️', description: 'Netflix and chill at home' },
+    { id: 'arcade', name: 'Arcade Adventure 🎮', description: 'Gaming fun and friendly competition' },
+    { id: 'cooking', name: 'Cooking Together 👩‍🍳', description: 'Let\'s create a delicious meal together' },
+    { id: 'beach', name: 'Beach Walk 🏖️', description: 'Romantic stroll along the shoreline' },
+    { id: 'museum', name: 'Museum Visit 🏛️', description: 'Explore art and culture together' }
+  ];
+
+  const handleNoClick = () => {
+    setNoCount(prev => prev + 1);
+    setMessage(messages[noCount % messages.length]);
+  };
+
+  const handleYesClick = () => {
+    setYesPressed(true);
+  };
+
+  const handleConfirm = () => {
+    setShowConfirmation(true);
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+    }, 30_000);
+  };
+
+  const calculateButtonSize = () => {
+    //const baseSize = 'text-lg';
+    const sizes = ['text-xl', 'text-2xl', 'text-3xl'];
+    return noCount < sizes.length ? sizes[noCount] : sizes[sizes.length - 1];
+  };
+
+  const formatDateTime = (date: string, time: string) => {
+    const dateObj = new Date(`${date}T${time}`);
+    return dateObj.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    });
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4 overflow-hidden">
+      {showConfetti && 
+      <Confetti
+      width={window.innerWidth}
+      height={window.innerHeight}
+    />}
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        {!showConfirmation ? (
+          <div className="space-y-6">
+            {!yesPressed ? (
+              <>
+                <h2 className="text-2xl font-bold text-center text-pink-600 mb-8">
+                  {message}
+                </h2>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={handleYesClick}
+                    className={`${calculateButtonSize()} bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105 transition-all`}
+                  >
+                    Yes 💝
+                  </button>
+                  {noCount < 3 && (
+                    <button
+                      onClick={handleNoClick}
+                      className={`text-lg bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-full transform hover:scale-95 transition-all`}
+                    >
+                      No 😢
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Pick a date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full p-2 border border-pink-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Pick a time
+                      </label>
+                      <input
+                        type="time"
+                        className="w-full p-2 border border-pink-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    What kind of date?
+                  </label>
+                  <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+                    {dateTypes.map((type) => (
+                      <button
+                        key={type.id}
+                        onClick={() => setDateType(type.id)}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                          dateType === type.id
+                            ? 'border-pink-500 bg-pink-50'
+                            : 'border-gray-200 hover:border-pink-300'
+                        }`}
+                      >
+                        <div className="font-bold">{type.name}</div>
+                        <div className="text-sm text-gray-600">{type.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+                {selectedDate && selectedTime && dateType && (
+                  <button
+                    onClick={handleConfirm}
+                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105 transition-all"
+                  >
+                    Confirm Date 💕
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-bold text-pink-600">
+              Yay! I&apos;m so excited! 🎉
+            </h2>
+            <p className="text-gray-600">
+              Can&apos;t wait for our {dateTypes.find(t => t.id === dateType)?.name} on{' '}
+              {formatDateTime(selectedDate, selectedTime)}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default DateInvitation;
